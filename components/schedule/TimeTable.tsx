@@ -92,14 +92,23 @@ export const TimeTable: React.FC<TimeTableProps> = ({ programs }) => {
                   <div
                     key={`${prog.id}-${prog.start_time}`}
                     className={clsx(
-                      "absolute p-1 overflow-hidden rounded transition-all cursor-pointer group",
-                      "border hover:z-10 hover:shadow-lg hover:scale-[1.02]",
-                      // 色設定: DBのcolor値に応じてクラスを切り替える場合
+                      // 基本スタイル
+                      "absolute p-1 rounded border cursor-pointer group flex flex-col transition-all duration-200",
+                      
+                      // 通常時ははみ出しを隠す
+                      "overflow-hidden",
+                      
+                      // ホバー時のスタイル
+                      // !h-auto でインラインスタイルの高さを無視して中身に合わせて伸張
+                      "hover:h-auto! hover:z-50 hover:shadow-2xl hover:scale-[1.02]",
+                      
+                      // 色設定
                       getColorClass(prog.color)
                     )}
                     style={{
                       top: prog.top,
-                      height: prog.height - 2, // ボーダー重複を避けるマージン
+                      height: prog.height - 2,
+                      minHeight: prog.height - 2,
                       left: prog.laneIndex * COL_WIDTH + 2,
                       width: COL_WIDTH - 4,
                     }}
@@ -116,7 +125,7 @@ export const TimeTable: React.FC<TimeTableProps> = ({ programs }) => {
                         {formatTime30(prog.start_time)}～{formatTime30(prog.end_time)}
                       </span>
                       {/* 番組名 */}
-                      <span className="font-bold text-[13px] leading-tight line-clamp-3 group-hover:line-clamp-none">
+                      <span className="font-bold text-[13px] leading-tight group-hover:line-clamp-none mb-0.5">
                         {prog.name}
                       </span>
                     </div>
