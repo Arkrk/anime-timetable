@@ -9,6 +9,12 @@ export type ProgramData = {
   channel_name: string;
   channel_order: number;
   color?: number; // 1-8
+  website_url: string | null;
+  annict_url: string | null;
+  wikipedia_url: string | null;
+  tags: string[];
+  version: string | null;
+  note: string | null;
 };
 
 // 描画用に計算された座標情報を持つ型

@@ -1,16 +1,12 @@
 import React, { useMemo } from "react";
-import { clsx } from "clsx";
 import { ProgramData } from "@/types/schedule";
-import { format, parseISO } from "date-fns";
-import { ja } from "date-fns/locale";
 import {
   calculateLayout,
-  formatTime30,
   START_HOUR,
   END_HOUR,
   HOUR_HEIGHT,
-  COL_WIDTH,
 } from "@/lib/schedule-utils";
+import { ProgramCard } from "./ProgramCard";
 
 type TimeTableProps = {
   programs: ProgramData[];
@@ -89,47 +85,10 @@ export const TimeTable: React.FC<TimeTableProps> = ({ programs }) => {
 
                 {/* 番組カード配置 */}
                 {channel.programs.map((prog) => (
-                  <div
-                    key={`${prog.id}-${prog.start_time}`}
-                    className={clsx(
-                      // 基本スタイル
-                      "absolute p-1 rounded border cursor-pointer group flex flex-col transition-all duration-200",
-                      
-                      // 通常時ははみ出しを隠す
-                      "overflow-hidden",
-                      
-                      // ホバー時のスタイル
-                      // !h-auto でインラインスタイルの高さを無視して中身に合わせて伸張
-                      "hover:h-auto! hover:z-50 hover:shadow-2xl hover:scale-[1.02]",
-                      
-                      // 色設定
-                      getColorClass(prog.color)
-                    )}
-                    style={{
-                      top: prog.top,
-                      height: prog.height - 2,
-                      minHeight: prog.height - 2,
-                      left: prog.laneIndex * COL_WIDTH + 2,
-                      width: COL_WIDTH - 4,
-                    }}
-                  >
-                    <div className="flex flex-col h-full">
-                      {/* 開始日表示 */}
-                      {prog.start_date && (
-                         <span className="text-gray-600 text-xs w-fit rounded">
-                           {format(parseISO(prog.start_date), "M月d日スタート", { locale: ja })}
-                         </span>
-                      )}
-                      {/* 時刻表示 */}
-                      <span className="font-mono text-xs opacity-70 leading-none mb-0.5 tracking-tight">
-                        {formatTime30(prog.start_time)}～{formatTime30(prog.end_time)}
-                      </span>
-                      {/* 番組名 */}
-                      <span className="font-bold text-[13px] leading-tight group-hover:line-clamp-none mb-0.5">
-                        {prog.name}
-                      </span>
-                    </div>
-                  </div>
+                  <ProgramCard 
+                    key={`${prog.id}-${prog.start_time}`} 
+                    program={prog} 
+                  />
                 ))}
               </div>
             </div>
@@ -146,25 +105,3 @@ export const TimeTable: React.FC<TimeTableProps> = ({ programs }) => {
     </div>
   );
 };
-
-// ヘルパー: 色クラスの決定
-function getColorClass(colorId?: number) {
-  // DBのcolor値(1~8)に対応するTailwindクラス
-  const colors = [
-    "bg-gray-100 border-gray-200 text-gray-800",   // default
-    "bg-red-100 border-red-200 text-red-900",      // 1
-    "bg-blue-100 border-blue-200 text-blue-900",     // 2
-    "bg-green-100 border-green-200 text-green-900",   // 3
-    "bg-yellow-100 border-yellow-200 text-yellow-900", // 4
-    "bg-purple-100 border-purple-200 text-purple-900", // 5
-    "bg-pink-100 border-pink-200 text-pink-900",     // 6
-    "bg-orange-100 border-orange-200 text-orange-900", // 7
-    "bg-teal-100 border-teal-200 text-teal-900",     // 8
-  ];
-  return colors[colorId ? colorId - 1 : 0] || colors[0];
-}
-
-// ヘルパー: 時刻表示の整形 (秒をカット)
-function formatTime(timeStr: string) {
-  return timeStr.substring(0, 5);
-}

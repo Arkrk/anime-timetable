@@ -25,14 +25,17 @@ export async function getScheduleByDay(day: number, seasonId: number): Promise<P
       end_time,
       color,
       day_of_the_week,
-      works ( name ),
+      version,
+      note,
+      works ( name, website_url, annict_url, wikipedia_url ),
       channels (
         id,
         name,
         order,
         areas ( name, order )
       ),
-      programs_seasons!inner ( season_id ) 
+      programs_seasons!inner ( season_id ),
+      programs_tags ( tags ( name ) )
     `)
     .eq("day_of_the_week", day)
     .eq("programs_seasons.season_id", seasonId) // シーズンを絞り込み
@@ -56,7 +59,14 @@ export async function getScheduleByDay(day: number, seasonId: number): Promise<P
     channel_name: item.channels?.name || "不明なチャンネル",
     // ソート用にチャンネルのオーダーを使用
     channel_order: (item.channels?.areas?.order || 0) * 1000 + (item.channels?.order || 0),
+    version: item.version,
+    note: item.note,
     color: item.color,
+    website_url: item.works?.website_url ?? null,
+    annict_url: item.works?.annict_url ?? null,
+    wikipedia_url: item.works?.wikipedia_url ?? null,
+    // タグ配列をフラット化 (例: [{tags: {name: "字"}}, ...] -> ["字", ...])
+    tags: item.programs_tags?.map((pt: any) => pt.tags?.name).filter(Boolean) || [],
   }));
 
   return formattedData;
