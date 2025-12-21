@@ -1,0 +1,29 @@
+// DBから取得する生の番組データの型（結合済みデータを想定）
+export type ProgramData = {
+  id: number;
+  name: string; // works.name または programs.note などから生成
+  start_time: string; // "23:00:00" や "01:30:00"
+  end_time: string;
+  channel_id: number;
+  channel_name: string;
+  channel_order: number;
+  color?: number; // 1-8
+};
+
+// 描画用に計算された座標情報を持つ型
+export type LayoutProgram = ProgramData & {
+  top: number;       // CSS top (px)
+  height: number;    // CSS height (px)
+  laneIndex: number; // 左から何番目の列か (0〜)
+  isNextDay: boolean; // 24時以降かどうか（表示上の判定用）
+};
+
+// チャンネルごとの描画データ
+export type ChannelLayout = {
+  id: number;
+  name: string;
+  order: number;
+  width: number;     // チャンネル列全体の幅 (px)
+  maxLanes: number;  // 最大重複数
+  programs: LayoutProgram[];
+};
