@@ -88,7 +88,8 @@ export const TimeTable: React.FC<TimeTableProps> = ({ programs, mode = "channel"
                 {channel.programs.map((prog) => (
                   <ProgramCard 
                     key={`${prog.id}-${prog.start_time}`} 
-                    program={prog} 
+                    program={prog}
+                    mode={mode}
                   />
                 ))}
               </div>

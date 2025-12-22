@@ -6,7 +6,7 @@ import { format, parseISO } from "date-fns";
 import { ja } from "date-fns/locale";
 import { Copy, Check, ExternalLink, Tv, Calendar } from "lucide-react";
 
-import { LayoutProgram } from "@/types/schedule";
+import { LayoutProgram, LayoutMode } from "@/types/schedule";
 import { formatTime30, COL_WIDTH } from "@/lib/schedule-utils";
 import {
   HoverCard,
@@ -17,9 +17,10 @@ import { Button } from "@/components/ui/button";
 
 type ProgramCardProps = {
   program: LayoutProgram;
+  mode: LayoutMode;
 };
 
-export const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
+export const ProgramCard: React.FC<ProgramCardProps> = ({ program, mode }) => {
   const [copied, setCopied] = useState(false);
 
   // クリップボードコピー機能
@@ -68,14 +69,20 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
           }}
         >
           <div className="flex flex-col h-full">
+            {/* チャンネル名（エリア別表示時のみ） */}
+            {mode === "area" && (
+              <span className="text-xs font-semibold text-black truncate leading-none shrink-0">
+                {program.channel_name}
+              </span>
+            )}
             {/* 放送開始日 */}
             {program.start_date && (
-              <span className="text-xs text-gray-600 w-fit rounded shrink-0">
+              <span className="text-xs text-black w-fit rounded shrink-0">
                 {format(parseISO(program.start_date), "M月d日スタート", { locale: ja })}
               </span>
             )}
             {/* 放送時間 */}
-            <span className="font-mono text-xs opacity-70 leading-none mb-0.5 tracking-tight shrink-0">
+            <span className="font-mono text-xs opacity-70 leading-none my-0.5 tracking-tight shrink-0">
               {formatTime30(program.start_time)}～{formatTime30(program.end_time)}
             </span>
             {/* 番組名 */}
