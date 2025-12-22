@@ -20,11 +20,10 @@ export const SeasonSelector = ({ seasons, currentSeasonId }: SeasonSelectorProps
   const searchParams = useSearchParams();
 
   const handleValueChange = (value: string) => {
-    // 現在の曜日パラメータを維持しつつ、seasonパラメータを更新
+    // 現在のクエリパラメータをコピーしてインスタンス化
     const params = new URLSearchParams(searchParams.toString());
+     // seasonのみを更新
     params.set("season", value);
-    
-    // URLを更新 (ページ遷移)
     router.push(`/?${params.toString()}`);
   };
 

@@ -11,22 +11,21 @@ type DayTabsProps = {
 
 export const DayTabs: React.FC<DayTabsProps> = ({ currentDay }) => {
   const searchParams = useSearchParams();
-  const currentSeason = searchParams.get("season"); // 現在のシーズンを取得
 
   return (
     <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit overflow-x-auto">
       {DAYS.map((d) => {
         const isActive = d.id === currentDay;
         
-        // リンク生成時に season パラメータがあれば付与する
-        const href = currentSeason 
-          ? `/?season=${currentSeason}&day=${d.id}`
-          : `/?day=${d.id}`;
+        // 現在のクエリパラメータをコピーしてインスタンス化
+        const newParams = new URLSearchParams(searchParams.toString());
+        // dayパラメータのみを更新
+        newParams.set("day", d.id.toString());
 
         return (
           <Link
             key={d.id}
-            href={href}
+            href={`/?${newParams.toString()}`} // 新しいパラメータでURL生成
             scroll={false}
             className={clsx(
               "px-4 py-2 text-sm font-medium rounded-md transition-all whitespace-nowrap",

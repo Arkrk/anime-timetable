@@ -8,6 +8,9 @@ export type ProgramData = {
   channel_id: number;
   channel_name: string;
   channel_order: number;
+  area_id: number;
+  area_name: string;
+  area_order: number;
   color?: number; // 1-8
   website_url: string | null;
   annict_url: string | null;
@@ -16,6 +19,9 @@ export type ProgramData = {
   version: string | null;
   note: string | null;
 };
+
+// 計算モードの型
+export type LayoutMode = "channel" | "area";
 
 // 描画用に計算された座標情報を持つ型
 export type LayoutProgram = ProgramData & {

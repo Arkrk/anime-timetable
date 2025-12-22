@@ -32,7 +32,7 @@ export async function getScheduleByDay(day: number, seasonId: number): Promise<P
         id,
         name,
         order,
-        areas ( name, order )
+        areas ( id, name, order )
       ),
       programs_seasons!inner ( season_id ),
       programs_tags ( tags ( name ) )
@@ -57,8 +57,10 @@ export async function getScheduleByDay(day: number, seasonId: number): Promise<P
     end_time: item.end_time,
     channel_id: item.channels?.id,
     channel_name: item.channels?.name || "不明なチャンネル",
-    // ソート用にチャンネルのオーダーを使用
-    channel_order: (item.channels?.areas?.order || 0) * 1000 + (item.channels?.order || 0),
+    channel_order: item.channels?.order || 0,
+    area_id: item.channels?.areas?.id || 0,
+    area_name: item.channels?.areas?.name || "不明なエリア",
+    area_order: item.channels?.areas?.order || 0,
     version: item.version,
     note: item.note,
     color: item.color,

@@ -1,9 +1,11 @@
 import { Suspense } from "react";
 import { getScheduleByDay, DAYS } from "@/lib/get-schedule";
-import { getSeasons } from "@/lib/get-seasons"; // 追加
+import { getSeasons } from "@/lib/get-seasons";
 import { TimeTable } from "@/components/schedule/TimeTable";
 import { DayTabs } from "@/components/schedule/DayTabs";
-import { SeasonSelector } from "@/components/schedule/SeasonSelector"; // 追加
+import { SeasonSelector } from "@/components/schedule/SeasonSelector";
+import { ViewSelector } from "@/components/schedule/ViewSelector";
+import { LayoutMode } from "@/types/schedule";
 
 type PageProps = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -11,6 +13,10 @@ type PageProps = {
 
 export default async function Home({ searchParams }: PageProps) {
   const params = await searchParams;
+
+  // viewパラメータの取得
+  const viewParam = params.view as string;
+  const layoutMode: LayoutMode = (viewParam === "area") ? "area" : "channel";
   
   // 1. シーズン一覧を取得
   const seasons = await getSeasons();
@@ -41,23 +47,25 @@ export default async function Home({ searchParams }: PageProps) {
            {seasonLabel} アニメ番組表
         </h1>
         <p className="text-sm text-gray-500 mt-1">
-          {validDay === dbToday ? "今日" : dayLabel + "曜"}のアニメ放送スケジュール (20:00〜29:00)
+          {validDay === dbToday ? "今日" : dayLabel + "曜"}のアニメ番組表
         </p>
       </div>
 
-      {/* クール / 曜日 */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
-        <SeasonSelector 
-          seasons={seasons} 
-          currentSeasonId={currentSeasonId} 
-        />
-        
-        <DayTabs currentDay={validDay} />
+      {/* コントロールバー */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+        {/* シーズン選択と曜日タブ */}
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+          <SeasonSelector seasons={seasons} currentSeasonId={currentSeasonId} />
+          <DayTabs currentDay={validDay} />
+        </div>
+
+        {/* 表示切替 */}
+        <ViewSelector />
       </div>
 
       <div className="flex-1 min-h-150 border rounded-lg bg-white shadow-lg overflow-hidden relative">
         <Suspense fallback={<LoadingSkeleton />}>
-           <TimeTable programs={programs} />
+           <TimeTable programs={programs} mode={layoutMode} />
         </Suspense>
       </div>
     </main>

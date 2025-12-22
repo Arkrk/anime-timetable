@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { ProgramData } from "@/types/schedule";
+import { ProgramData, LayoutMode } from "@/types/schedule";
 import {
   calculateLayout,
   START_HOUR,
@@ -10,11 +10,12 @@ import { ProgramCard } from "./ProgramCard";
 
 type TimeTableProps = {
   programs: ProgramData[];
+  mode?: LayoutMode;
 };
 
-export const TimeTable: React.FC<TimeTableProps> = ({ programs }) => {
+export const TimeTable: React.FC<TimeTableProps> = ({ programs, mode = "channel" }) => {
   // データを元にレイアウトを計算（メモ化して再計算を防ぐ）
-  const channels = useMemo(() => calculateLayout(programs), [programs]);
+  const channels = useMemo(() => calculateLayout(programs, mode), [programs, mode]);
 
   // 全体の高さ (20時〜29時 = 9時間)
   const totalHours = END_HOUR - START_HOUR;

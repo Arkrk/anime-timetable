@@ -1,4 +1,4 @@
-import { ProgramData, ChannelLayout, LayoutProgram } from "@/types/schedule";
+import { ProgramData, ChannelLayout, LayoutProgram, LayoutMode } from "@/types/schedule";
 
 // 設定
 export const START_HOUR = 20; // 20時開始
@@ -31,46 +31,59 @@ export const calculatePosition = (timeStr: string) => {
 /**
  * 番組データの配列を受け取り、配置計算済みのチャンネル配列を返す
  */
-export const calculateLayout = (programs: ProgramData[]): ChannelLayout[] => {
-  // 1. チャンネルIDでグループ化
-  const channelsMap = new Map<number, ProgramData[]>();
-  
-  // チャンネル名などのメタデータを保持するためのMap
-  const channelMeta = new Map<number, { name: string; order: number }>();
+export const calculateLayout = (programs: ProgramData[], mode: LayoutMode): ChannelLayout[] => {
+  // グループ化のキーとメタデータを保持するMap
+  const groupsMap = new Map<number, ProgramData[]>();
+  const metaMap = new Map<number, { name: string; order: number }>();
 
   programs.forEach((p) => {
-    if (!channelsMap.has(p.channel_id)) {
-      channelsMap.set(p.channel_id, []);
-      channelMeta.set(p.channel_id, { name: p.channel_name, order: p.channel_order });
+    // モードによってキーを切り替え
+    const key = mode === "channel" ? p.channel_id : p.area_id;
+    
+    if (!groupsMap.has(key)) {
+      groupsMap.set(key, []);
+      
+      // メタデータもモードによって切り替え
+      if (mode === "channel") {
+        // チャンネル別
+        const sortOrder = p.area_order * 1000 + p.channel_order;
+        metaMap.set(key, { name: p.channel_name, order: sortOrder });
+      } else {
+        // エリア別
+        metaMap.set(key, { name: p.area_name, order: p.area_order });
+      }
     }
-    channelsMap.get(p.channel_id)!.push(p);
+    groupsMap.get(key)!.push(p);
   });
 
   const result: ChannelLayout[] = [];
 
-  // 2. 各チャンネルごとに配置計算
-  channelsMap.forEach((progs, channelId) => {
-    // 時間順にソート（重要）
+  groupsMap.forEach((progs, key) => {
+    // ソート順: 開始時間(昇順) -> チャンネル順(昇順)
+    // エリア表示の場合、同じ時間に複数のチャンネルが重なるため、チャンネル順序で左詰めにする
     progs.sort((a, b) => {
       const posA = calculatePosition(a.start_time).minutesFromStart;
       const posB = calculatePosition(b.start_time).minutesFromStart;
-      return posA - posB;
+      
+      if (posA !== posB) {
+        return posA - posB; // 時間優先
+      }
+      // 時間が同じならチャンネルオーダー順
+      return (a.area_order * 1000 + a.channel_order) - (b.area_order * 1000 + b.channel_order);
     });
 
     const layoutProgs: LayoutProgram[] = [];
-    const lanes: number[] = []; // 各レーンの「埋まっている最後の時間(分)」を保持
+    const lanes: number[] = [];
 
     progs.forEach((prog) => {
       const { minutesFromStart: startMin, isNextDay } = calculatePosition(prog.start_time);
       const { minutesFromStart: endMin } = calculatePosition(prog.end_time);
-
+      
       // 終了時間が開始時間より前になってしまう場合（日またぎ計算ミス等）のガード
-      const safeEndMin = endMin < startMin ? endMin + 24 * 60 : endMin; 
-      const duration = safeEndMin - startMin;
-
-      // 配置座標
+      const safeEndMin = endMin < startMin ? endMin + 24 * 60 : endMin;
+      
       const top = startMin * MIN_HEIGHT;
-      const height = Math.max(duration * MIN_HEIGHT, 20); // 最低高さを確保
+      const height = Math.max((safeEndMin - startMin) * MIN_HEIGHT, 20);
 
       // レーン割当アルゴリズム
       // 空いている(startMinより前に終わっている)一番左のレーンを探す
@@ -100,9 +113,10 @@ export const calculateLayout = (programs: ProgramData[]): ChannelLayout[] => {
       });
     });
 
-    const meta = channelMeta.get(channelId)!;
+    const meta = metaMap.get(key)!;
+    
     result.push({
-      id: channelId,
+      id: key,
       name: meta.name,
       order: meta.order,
       maxLanes: lanes.length > 0 ? lanes.length : 1, // 最低1列
@@ -111,7 +125,7 @@ export const calculateLayout = (programs: ProgramData[]): ChannelLayout[] => {
     });
   });
 
-  // チャンネルの表示順序(order)でソート
+  // 表示順(order)で列をソート
   return result.sort((a, b) => a.order - b.order);
 };
 
