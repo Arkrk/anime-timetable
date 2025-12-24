@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { Header } from "@/components/layout/Header";
 import { getScheduleByDay, DAYS } from "@/lib/get-schedule";
 import { getSeasons } from "@/lib/get-seasons";
 import { TimeTable } from "@/components/schedule/TimeTable";
@@ -34,38 +35,30 @@ export default async function Home({ searchParams }: PageProps) {
   const currentDay = dayParam ? Number(dayParam) : dbToday;
   const validDay = (currentDay >= 1 && currentDay <= 7) ? currentDay : 1;
 
-  // 4. 番組データ取得 (seasonIdを渡す)
+  // 4. 番組データ取得
   const programs = await getScheduleByDay(validDay, currentSeasonId);
 
-  const dayLabel = DAYS.find(d => d.id === validDay)?.label;
-  const seasonLabel = seasons.find(s => s.id === currentSeasonId)?.name || "";
-
   return (
-    <main className="flex min-h-screen flex-col p-4 bg-gray-50">
-      <div className="flex flex-col mb-4">
-        <h1 className="text-2xl font-bold text-gray-800">
-           {seasonLabel} アニメ番組表
-        </h1>
-        <p className="text-sm text-gray-500 mt-1">
-          {validDay === dbToday ? "今日" : dayLabel + "曜"}のアニメ番組表
-        </p>
-      </div>
+    <main className="flex flex-col h-screen bg-gray-50 overflow-hidden">
+      
+      {/* 1. 共通ヘッダー */}
+      <Header />
 
-      {/* コントロールバー */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-        {/* シーズン選択と曜日タブ */}
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          <SeasonSelector seasons={seasons} currentSeasonId={currentSeasonId} />
-          <DayTabs currentDay={validDay} />
+      {/* 2. コントロールバー */}
+      <div className="shrink-0 p-4 border-b bg-white z-99">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            <SeasonSelector seasons={seasons} currentSeasonId={currentSeasonId} />
+            <DayTabs currentDay={validDay} />
+          </div>
+          <ViewSelector />
         </div>
-
-        {/* 表示切替 */}
-        <ViewSelector />
       </div>
 
-      <div className="flex-1 min-h-150 border rounded-lg bg-white shadow-lg overflow-hidden relative">
+      {/* 3. 番組表エリア  */}
+      <div className="flex-1 overflow-hidden relative">
         <Suspense fallback={<LoadingSkeleton />}>
-           <TimeTable programs={programs} mode={layoutMode} />
+          <TimeTable programs={programs} mode={layoutMode} />
         </Suspense>
       </div>
     </main>

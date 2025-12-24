@@ -86,7 +86,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program, mode }) => {
               {formatTime30(program.start_time)}～{formatTime30(program.end_time)}
             </span>
             {/* 番組名 */}
-            <span className="font-bold text-[13px] leading-tight line-clamp-2 group-hover:line-clamp-none mb-0.5">
+            <span className="font-bold text-[13px] leading-tight group-hover:line-clamp-none mb-0.5">
               {program.name}
             </span>
           </div>
@@ -94,7 +94,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program, mode }) => {
       </HoverCardTrigger>
 
       {/* Hover Card */}
-      <HoverCardContent className="w-80 p-4 shadow-xl z-50" side="right" align="start">
+      <HoverCardContent className="w-80 p-4 shadow-xl z-100" side="right" align="start">
         <div className="flex flex-col gap-3">
           {/* チャンネル名・放送日時 */}
           <div className="flex items-start justify-between text-xs text-muted-foreground">
