@@ -32,10 +32,10 @@ export const SeasonSelector = ({ seasons, currentSeasonId }: SeasonSelectorProps
       value={currentSeasonId.toString()}
       onValueChange={handleValueChange}
     >
-      <SelectTrigger className="w-45 bg-white">
+      <SelectTrigger className="bg-white">
         <SelectValue placeholder="放送クールを選択" />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="z-100">
         {seasons.map((season) => (
           <SelectItem key={season.id} value={season.id.toString()}>
             {season.name}

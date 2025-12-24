@@ -11,7 +11,7 @@ import {
 import { ProgramCard } from "./ProgramCard";
 
 const TIME_COL_WIDTH = 35;
-const HEADER_HEIGHT = 40;
+const HEADER_HEIGHT = 35;
 const TOTAL_HEIGHT = (END_HOUR - START_HOUR) * HOUR_HEIGHT;
 
 type TimeTableProps = {

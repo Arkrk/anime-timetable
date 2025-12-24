@@ -25,13 +25,13 @@ export const ViewSelector = () => {
 
   return (
     <Select value={currentView} onValueChange={handleValueChange}>
-      <SelectTrigger className="w-40 bg-white">
+      <SelectTrigger className="bg-white">
         <div className="flex items-center gap-2 text-gray-600">
           <Layout className="h-4 w-4" />
           <SelectValue placeholder="表示切替" />
         </div>
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="z-100">
         <SelectItem value="channel">チャンネル別</SelectItem>
         <SelectItem value="area">エリア別</SelectItem>
       </SelectContent>
