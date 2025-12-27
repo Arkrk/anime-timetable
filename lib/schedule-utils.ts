@@ -150,3 +150,20 @@ export const formatTime30 = (timeStr: string) => {
   
   return `${hour}:${minStr}`;
 };
+
+/**
+ * 番組の色IDからTailwindのクラス名を取得する
+ */
+export const getProgramColorClass = (colorId?: number | null) => {
+  const colors = [
+    "bg-purple-100 border-purple-200 text-purple-900", // 1: 紫色
+    "bg-red-100 border-red-200 text-red-900",          // 2: 赤色
+    "bg-orange-100 border-orange-200 text-orange-900", // 3: オレンジ色
+    "bg-yellow-100 border-yellow-200 text-yellow-900", // 4: 黄色
+    "bg-green-100 border-green-200 text-green-900",    // 5: 緑色
+    "bg-blue-100 border-blue-200 text-blue-900",       // 6: 青色
+    "bg-gray-200 border-gray-200 text-gray-800",       // 7: 灰色
+    "bg-pink-100 border-pink-200 text-pink-900",       // 8: ピンク色
+  ];
+  return colors[(colorId || 1) - 1] || colors[6];
+};

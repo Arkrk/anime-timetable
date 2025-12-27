@@ -1,6 +1,7 @@
 // DBから取得する生の番組データの型（結合済みデータを想定）
 export type ProgramData = {
   id: number;
+  work_id: number;
   name: string;
   start_date: string;
   start_time: string;

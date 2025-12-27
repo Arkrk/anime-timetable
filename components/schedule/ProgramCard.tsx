@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { clsx } from "clsx";
 import { format, parseISO } from "date-fns";
 import { ja } from "date-fns/locale";
 import { Copy, Check, ExternalLink, Tv, Calendar } from "lucide-react";
 
 import { LayoutProgram, LayoutMode } from "@/types/schedule";
-import { formatTime30, COL_WIDTH } from "@/lib/schedule-utils";
+import { formatTime30, COL_WIDTH, getProgramColorClass } from "@/lib/schedule-utils";
 import {
   HoverCard,
   HoverCardContent,
@@ -34,20 +35,6 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program, mode }) => {
     }
   };
 
-  // 背景色の決定ロジック
-  const getColorClass = (colorId?: number) => {
-    const colors = [
-      "bg-purple-100 border-purple-200 text-purple-900", // 1: 紫色
-      "bg-red-100 border-red-200 text-red-900",          // 2: 赤色
-      "bg-orange-100 border-orange-200 text-orange-900", // 3: オレンジ色
-      "bg-yellow-100 border-yellow-200 text-yellow-900", // 4: 黄色
-      "bg-green-100 border-green-200 text-green-900",    // 5: 緑色
-      "bg-blue-100 border-blue-200 text-blue-900",       // 6: 青色
-      "bg-gray-200 border-gray-200 text-gray-800",       // 7: 灰色
-      "bg-pink-100 border-pink-200 text-pink-900",       // 8: ピンク色
-    ];
-    return colors[(colorId || 1) - 1] || colors[6];
-  };
 
   return (
     <HoverCard openDelay={300} closeDelay={50}>
@@ -58,7 +45,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program, mode }) => {
             "overflow-hidden",
             // ホバー時の拡張設定
             "hover:h-auto! hover:z-50 hover:shadow-2xl hover:scale-[1.02]",
-            getColorClass(program.color)
+            getProgramColorClass(program.color)
           )}
           style={{
             top: program.top,
@@ -116,7 +103,13 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program, mode }) => {
           {/* 作品名・コピーボタン */}
           <div className="flex items-start gap-2">
             <h4 className="text-sm font-bold leading-snug flex-1">
-              {program.name}
+              {program.work_id ? (
+                <Link href={`/works/${program.work_id}`} className="hover:underline">
+                  {program.name}
+                </Link>
+              ) : (
+                program.name
+              )}
             </h4>
             <Button
               variant="ghost"
